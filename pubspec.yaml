@@ -1,0 +1,121 @@
+name: taggin
+description: Connect with people nearby — Taggin.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.18.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  flutter_lints: ^5.0.0
+  flutter_local_notifications: ^17.2.1
+
+  # Firebase
+  firebase_core: ^2.30.0
+  firebase_auth: ^4.19.2
+  cloud_firestore: ^4.15.10
+  firebase_storage: ^11.7.0
+  firebase_messaging: ^14.9.4
+
+  # Utils
+  google_fonts: ^6.1.0
+  async: ^2.11.0
+  shared_preferences: ^2.2.3
+  intl: ^0.19.0
+  url_launcher: ^6.2.4
+
+  # Social login + media
+  google_sign_in: ^6.3.0
+  image_picker: ^1.1.2
+  flutter_image_compress: ^2.2.0
+  cached_network_image: ^3.3.1
+  image_cropper: ^7.1.0
+  image_editor_plus: ^1.0.6
+  camera: ^0.11.0+2
+  video_player: ^2.5.0
+  video_thumbnail: ^0.5.3
+  http: ^1.2.2
+  google_mlkit_face_detection: ^0.10.0
+
+
+
+  # Location & maps
+  geolocator: ^11.1.0
+  geoflutterfire2: ^2.3.15
+  permission_handler: ^11.4.0
+  flutter_map: ^8.2.1
+  latlong2: ^0.9.1
+
+  # UI / Icons
+  flutter_feather_icons: ^2.0.0
+  visibility_detector: ^0.4.0
+  rxdart: ^0.27.7
+
+  # File utils
+  path_provider: ^2.1.1
+  path: ^1.8.3
+  image: ^4.1.7
+  xml: ^6.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.14.0
+  flutter_native_splash: ^2.4.0
+  flutter_lints: ^5.0.0
+  leak_tracker: ^10.0.9
+  leak_tracker_flutter_testing: ^3.0.9
+  lints: ^5.1.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/logo.png   # ✅ Single logo for everything (App icon, Splash, PWA)
+    - assets/around_me_.png
+    - assets/friend_request.png
+    - assets/friends_icon.png
+    - assets/home_icon.png
+    - assets/messages.png
+    - assets/friends.png
+    - assets/posts.png
+    - assets/profile.png
+    - assets/notification.png
+    - assets/notification_icon.png
+    - assets/profile_icon.png
+    - assets/taggin_logo.png
+    - assets/upload.png
+    - assets/upload_icon.png
+    - assets/whos_around.png
+    - assets/uploadimages.png
+    - assets/uploadvideos.png
+    - assets/edit_profile.png
+    - assets/welcometotaggin.png
+    - assets/myfriendsprofile.png
+    - assets/explorenearby.png
+    - assets/nearbyme.png
+    - assets/city.png
+
+# ✅ Unified logo for app launcher (Android + iOS)
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo.png"     # ✅ Uses the same logo everywhere
+
+# ✅ Unified logo for splash screen (Android + iOS + Web)
+flutter_native_splash:
+  color: "#000000"
+  image: assets/logo.png            # ✅ Uses same logo
+  android: true
+  ios: true
+  web: true
+
+  android_gravity: center
+  ios_content_mode: center
+
+  android_12:
+    color: "#000000"
+    image: assets/logo.png          # ✅ Android 12 specific

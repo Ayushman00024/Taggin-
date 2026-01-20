@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="description" content="Taggin — Connect with people nearby." />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Taggin" />
+    <link rel="apple-touch-icon" href="assets/logo.png" />
+    <link rel="icon" type="image/png" href="assets/logo.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Taggin</title>
+
+    <style>
+        html, body {
+          margin: 0;
+          width: 100%;
+          height: 100%;
+          background-color: #000;
+        }
+        #splash {
+          position: fixed;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          background: #000;
+          z-index: 9999;
+        }
+        #splash img { width: 150px; }
+        #splash h1 {
+          margin-top: 18px;
+          font-family: "Montserrat", sans-serif;
+          font-weight: 600;
+          font-size: 26px;
+          color: #fff;
+          letter-spacing: 1px;
+        }
+        /* small style for install overlay content */
+        .taggin-install-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.85);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 99999;
+          font-family: Poppins, sans-serif;
+        }
+        .taggin-install-card {
+          position: relative;
+          background: #111;
+          border-radius: 20px;
+          text-align: center;
+          padding: 40px 30px;
+          width: 90%;
+          max-width: 400px;
+          box-shadow: 0 0 25px rgba(255,255,255,0.15);
+          color: #fff;
+        }
+        .taggin-install-card img { width: 80px; margin-bottom: 15px; }
+        .taggin-install-card h2 { margin: 0 0 8px 0; }
+        .taggin-install-card p { color: #ccc; font-size: 15px; margin-bottom: 20px; line-height: 1.6; }
+        .taggin-install-btn {
+          background: linear-gradient(90deg, #00ff88, #00b7ff);
+          color:#000; font-weight:700;
+          border:none; padding:12px 30px;
+          border-radius:12px; cursor:pointer;
+          margin-bottom:12px; width:100%; max-width:250px;
+        }
+        .taggin-later-btn {
+          background:transparent; color:#aaa;
+          border:1px solid #555; padding:10px 28px;
+          border-radius:10px; cursor:pointer;
+        }
+        .taggin-close-btn {
+          position: absolute; top: 10px; right: 15px;
+          background: none; border: none; color: #888;
+          font-size: 22px; cursor: pointer;
+        }
+    </style>
+
+    <script>
+        function removeSplashFromWeb() {
+          const splash = document.getElementById("splash");
+          if (splash) {
+            setTimeout(() => {
+              splash.style.transition = "opacity 0.8s ease";
+              splash.style.opacity = "0";
+              setTimeout(() => splash.remove(), 800);
+            }, 2000);
+          }
+          document.body.style.background = "#000";
+        }
+    </script>
+
+    <!-- ✅ Firebase SDK (for Web Push Notifications) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyA0EDmjszfnmGR0m0ouIMn7vRhXRrxiKiA",
+          authDomain: "tagginapp.firebaseapp.com",
+          projectId: "tagginapp",
+          storageBucket: "tagginapp.appspot.com",
+          messagingSenderId: "771138066392",
+          appId: "1:771138066392:web:e5d6a4c447f7519fe6c4ad",
+          measurementId: "G-V0D1LK6PSB",
+          vapidKey: "BBKe8Yf9op2PjsFDkfP6hJYYLcLb708EHPBrobhRsLhlELF5WagHt2n-XoakG9q9xZUmpKZIGjyCuNj9-kPC2M8"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
+
+        async function requestNotificationPermission() {
+          try {
+            const permission = await Notification.requestPermission();
+            if (permission === "granted") {
+              console.log("✅ Notification permission granted.");
+              const token = await messaging.getToken({ vapidKey: firebaseConfig.vapidKey });
+              console.log("🔑 Web FCM Token:", token);
+
+              messaging.onMessage((payload) => {
+                console.log("📬 Foreground message received:", payload);
+                const { title, body } = payload.notification || {};
+                new Notification(title || "Taggin", { body: body || "You got a new message 💬" });
+              });
+            } else {
+              console.warn("🚫 Notifications blocked by user.");
+            }
+          } catch (err) {
+            console.error("❌ Error requesting notification permission:", err);
+          }
+        }
+
+        window.addEventListener("load", () => {
+          requestNotificationPermission();
+        });
+    </script>
+</head>
+
+<body>
+<div id="splash">
+    <img src="assets/logo.png" alt="Taggin Logo" />
+    <h1>TAGGIN</h1>
+</div>
+
+<script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/firebase-messaging-sw.js")
+          .then((reg) => console.log("✅ Firebase Messaging SW registered:", reg.scope))
+          .catch((err) => console.error("❌ SW registration failed:", err));
+      });
+    }
+</script>
+
+<!-- ✅ Install Prompt Script — show once after 60s -->
+<script>
+    (function () {
+      const INSTALL_STORAGE_KEY = 'taggin_install_prompt_shown'; // localStorage key
+      const SHOW_DELAY_MS = 60_000; // 60 seconds
+
+      let deferredPrompt = null;
+      const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+      const isInStandalone =
+        (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+        window.navigator.standalone === true;
+
+      // If already installed or we've shown the prompt before, skip everything.
+      if (isInStandalone) {
+        console.log("🟢 Running in standalone mode — install prompt disabled.");
+        localStorage.setItem(INSTALL_STORAGE_KEY, 'installed');
+        return;
+      }
+      if (localStorage.getItem(INSTALL_STORAGE_KEY)) {
+        console.log("🔁 Install prompt already shown before — skipping.");
+        return;
+      }
+
+      // Capture beforeinstallprompt if available (Chromium).
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        console.log("✅ beforeinstallprompt captured and saved.");
+        // We don't call prompt here — we'll wait the 60s timer below.
+      });
+
+      // App installed -> mark it so we don't prompt later.
+      window.addEventListener("appinstalled", () => {
+        console.log("🎉 Taggin installed successfully!");
+        localStorage.setItem(INSTALL_STORAGE_KEY, 'installed');
+        deferredPrompt = null;
+      });
+
+      // Create and show the overlay UI.
+      function createInstallOverlay() {
+        // If already shown (race condition), return.
+        if (localStorage.getItem(INSTALL_STORAGE_KEY)) return;
+
+        // Mark as shown immediately so it will only appear once.
+        // This ensures "only once" even if user closes, dismisses, or navigates away.
+        localStorage.setItem(INSTALL_STORAGE_KEY, 'shown');
+
+        // Overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'install-overlay';
+        overlay.className = 'taggin-install-overlay';
+        overlay.innerHTML = `
+          <div class="taggin-install-card" role="dialog" aria-modal="true" aria-label="Install Taggin">
+            <button class="taggin-close-btn" id="closePrompt" aria-label="Close">×</button>
+            <img src="assets/logo.png" alt="Taggin logo">
+            <h2>Install / Add to Home Screen</h2>
+            <p>
+              Add <strong>Taggin</strong> to your device for a <strong>smoother experience</strong> and <strong>instant access</strong>.<br><br>
+              On Android, tap <strong>Install</strong> below or open your browser menu (⋮) → <strong>Add to Home Screen</strong>.<br><br>
+              On iPhone or iPad:<br>
+              1️⃣ Tap the <strong>Share</strong> icon (square with an ↑).<br>
+              2️⃣ Scroll down → <strong>Add to Home Screen</strong>.<br>
+              3️⃣ Tap <strong>Add</strong>.
+            </p>
+            <button id="installBtn" class="taggin-install-btn">📲 Install / Add to Home Screen</button>
+            <button id="laterBtn" class="taggin-later-btn">Later</button>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+
+        // handlers
+        const installBtn = document.getElementById('installBtn');
+        const laterBtn = document.getElementById('laterBtn');
+        const closeBtn = document.getElementById('closePrompt');
+
+        const closeOverlay = () => {
+          const el = document.getElementById('install-overlay');
+          if (el) el.remove();
+        };
+
+        installBtn.addEventListener('click', async () => {
+          // iOS: show instructions (can't trigger native prompt)
+          if (isIOS) {
+            alert("📲 iPhone/iPad users:\n1️⃣ Tap the Share icon (square with ↑)\n2️⃣ Scroll down → Add to Home Screen\n3️⃣ Tap Add to finish.");
+            closeOverlay();
+            return;
+          }
+
+          if (!deferredPrompt) {
+            // Fallback: suggest using browser menu
+            alert("📲 To install Taggin: open your browser menu (⋮) → Add to Home Screen");
+            closeOverlay();
+            return;
+          }
+
+          // Show native prompt
+          try {
+            deferredPrompt.prompt();
+            const choice = await deferredPrompt.userChoice;
+            console.log('User response to install prompt:', choice);
+            deferredPrompt = null;
+          } catch (err) {
+            console.error('Error showing install prompt:', err);
+          } finally {
+            closeOverlay();
+          }
+        });
+
+        // "Later" means we still won't show automatically again (per your "only once" request).
+        laterBtn.addEventListener('click', closeOverlay);
+        closeBtn.addEventListener('click', closeOverlay);
+
+        // Safety: auto-close after 10s so it doesn't block UX too long
+        setTimeout(closeOverlay, 10000);
+      }
+
+      // Start single timer on load to show overlay after 60s (only once).
+      window.addEventListener('load', () => {
+        try {
+          // If key got set between initial checks and load, don't schedule.
+          if (localStorage.getItem(INSTALL_STORAGE_KEY)) return;
+          setTimeout(() => {
+            // final check before showing
+            if (localStorage.getItem(INSTALL_STORAGE_KEY)) return;
+            // Avoid showing if app installed in the meantime
+            const nowInStandalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+                                    window.navigator.standalone === true;
+            if (nowInStandalone) {
+              localStorage.setItem(INSTALL_STORAGE_KEY, 'installed');
+              return;
+            }
+
+            createInstallOverlay();
+          }, SHOW_DELAY_MS);
+        } catch (err) {
+          console.error('Error scheduling install prompt:', err);
+        }
+      });
+
+      // Optional helper to let you re-enable prompt via console/settings:
+      // localStorage.removeItem('taggin_install_prompt_shown')
+      // or set it to a value for tracking.
+    })();
+</script>
+
+<script src="flutter_bootstrap.js?v=3" async onload="removeSplashFromWeb()"></script>
+</body>
+</html>
